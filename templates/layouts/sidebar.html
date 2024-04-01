@@ -1,0 +1,29 @@
+<!-- <div class="backdrop"></div> -->
+
+<div class="[grid-area:sidebar] bg-white h-full">
+    <div class="sidebar-links">
+        <div class="nav-link">
+            <a href="">
+                <i class="bi bi-house"></i>
+                <span>Home</span>
+            </a>
+        </div>
+
+        <hr>
+
+        <div class="nav-link">
+            <a>
+                <i class="bi bi-grid"></i>
+                <span>Kit de Herramientas</span>
+                <i class='bx bx-chevron-down arrow'></i>
+            </a>
+            <div class="options-list">
+                <a href="">Option</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if not request.path == '/principal/' %}
+<script src="{{ static('assets/js/toolskit.utils.abrirvpn.js') }}"></script>
+{% endif %}

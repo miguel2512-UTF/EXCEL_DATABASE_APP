@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#app {
+    display: grid;
+    grid-template-areas: 
+        "sidebar header header"
+        "sidebar main main"
+    ;
+    grid-template-columns: 18.75rem 1fr;
+    grid-template-rows: auto 1fr;
+    height: calc(100vh - 1rem);
+    gap: 0.5rem;
+    margin: .5rem;
+}

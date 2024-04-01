@@ -1,0 +1,10 @@
+<div class="loader-content">
+    {% if request.path.startswith('/excel/spreadsheet/') %}
+        <div class="excel-loader">
+            <i class="bi bi-filetype-xlsx"></i>
+            <p>Cargando {{ excel_data.name }}...</p>
+        </div>  
+    {% else %}        
+        <div class="loader"></div>
+    {% endif %}
+</div>
