@@ -7,7 +7,8 @@ import math
 import json
 
 def excel_home(request):
-    excel_list = list(Excel.objects.values())
+    excel_list = list(Excel.objects.values("id", "name", "records_length"))
+    excel_list.sort(key=lambda x: x["id"])
     return render(request, "excel/excel.html", {"excel":"", "excel_list":excel_list, "form": ExcelForm()})
 
 def load_sheet_data(sheet_url):
@@ -56,12 +57,12 @@ def create_excel(request):
         return redirect("excel_home")
 
 def get_excel(request, id):
-    excel = Excel.objects.get(id=id)
+    excel = Excel.objects.values("id", "name", "url").get(id=id)
 
     excel_dict = {
-        "id": excel.id,
-        "name": excel.name,
-        "url": excel.url,
+        "id": excel["id"],
+        "name": excel["name"],
+        "url": excel["url"],
     }
 
     return HttpResponse(json.dumps(excel_dict), "application/json")
