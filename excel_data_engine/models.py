@@ -7,7 +7,6 @@ class Excel(models.Model):
     refresh = models.BooleanField(default=True)
     data = models.JSONField(default=dict)
     records_length = models.CharField(max_length=500)
-    loadImages = models.BooleanField(default=False)
 
     class Meta:
         db_table = "excel_database"

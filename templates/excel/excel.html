@@ -33,7 +33,7 @@
         <table class="table-list w-full border-separate border-spacing-y-3">
           <tr class="[background:#212332]">
             <th class="py-2.5 px-4 rounded-l-lg">Name</th>
-            <th class="py-2.5 px-4 rounded-l-lg">Records Length</th>
+            <th class="py-2.5 px-4">Records Length</th>
             <th class="py-2.5 px-4 rounded-r-lg">Actions</th>
           </tr>
           {% for excel in excel_list %}
@@ -41,7 +41,7 @@
             <td class="py-2.5 px-4 rounded-l-lg">
               {{ excel.name }}
             </td>
-            <td class="py-2.5 px-4 rounded-l-lg">
+            <td class="py-2.5 px-4">
               {{ excel.records_length }}
             </td>
             <td class="py-2.5 px-4 rounded-r-lg">
@@ -68,9 +68,9 @@
         </div>
         <form action="/excel/create/" method="post">
           {{ csrf_input }}
-          <div class="modal-body py-2">
+          <div class="modal-body py-4">
             {% for field in form %}
-            <div class="my-2">
+            <div class="mb-2">
               <label class="my-1" for="">{{ field.label }}</label>
               {{ field }}
             </div>
@@ -97,9 +97,9 @@
         <form action="/excel/update/" method="post">
           <input type="hidden" name="id" id="id_excel">
           {{ csrf_input }}
-          <div class="modal-body py-2">
+          <div class="modal-body py-4">
             {% for field in form %}
-            <div class="my-2">
+            <div class="mb-2">
               <label class="my-1" for="">{{ field.label }}</label>
               {{ field }}
             </div>

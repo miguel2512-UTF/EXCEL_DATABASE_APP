@@ -62,7 +62,6 @@ def get_excel(request, id):
         "id": excel.id,
         "name": excel.name,
         "url": excel.url,
-        "loadImages": excel.loadImages,
     }
 
     return HttpResponse(json.dumps(excel_dict), "application/json")
