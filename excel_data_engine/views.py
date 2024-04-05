@@ -24,6 +24,7 @@ def load_sheet_data(sheet_url):
             if type(table[index][key]) == float:
                 if math.isnan(table[index][key]):
                     table[index][key] = ''
+                table[index][key] = math.trunc(table[index][key]) if type(table[index][key]) != str else table[index][key]
             elif type(table[index][key]) == NoneType:
                 table[index][key] = ''
     
@@ -90,5 +91,14 @@ def update_excel(request):
 def get_sheet_data(request, id_sheet):
     excel = Excel.objects.get(id = id_sheet)
     data = json.loads(excel.data)
+    fields = data[0].keys()
+    for field in fields:
+        param = request.GET.get(field, "")
+        data = [ record for record in data if record[field] == param ] if param != "" else data
 
-    return HttpResponse(data, content_type = "application/json")
+    res = {
+        "length": len(data),
+        "results": data
+    }
+
+    return HttpResponse(json.dumps(res), content_type = "application/json")
