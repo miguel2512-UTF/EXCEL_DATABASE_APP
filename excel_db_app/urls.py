@@ -24,5 +24,6 @@ def hello(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', hello),
-    path('excel/', include('excel_data_engine.urls'))
+    path('excel/', include('excel_data_engine.urls')),
+    path('', include('authentication.urls'))
 ]

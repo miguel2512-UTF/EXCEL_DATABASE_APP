@@ -8,5 +8,6 @@ urlpatterns = [
     path('update/', views.update_excel),
     path('get/<int:id>', views.get_excel),
     path('refresh/<int:id_sheet>', views.refresh_excel),
-    path('data/<int:id_sheet>', views.get_sheet_data)
-]
+    path('api/data/<int:id_sheet>    ', views.get_sheet_data),
+    path('api/<str:name>/data/<int:id_sheet>', views.get_sheet_data)
+]    

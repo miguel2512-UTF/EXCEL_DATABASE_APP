@@ -630,10 +630,6 @@ video {
   overflow: auto;
 }
 
-.rounded-md {
-  border-radius: 0.375rem;
-}
-
 .rounded-l-lg {
   border-top-left-radius: 0.5rem;
   border-bottom-left-radius: 0.5rem;
@@ -717,17 +713,6 @@ video {
   color: rgb(255 255 255 / var(--tw-text-opacity));
 }
 
-.outline-none {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-}
-
-.transition-all {
-  transition-property: all;
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  transition-duration: 150ms;
-}
-
 .\[background\:\#212332\] {
   background: #212332;
 }
@@ -786,39 +771,6 @@ body {
   margin: .5rem;
 }
 
-.first\:rounded-l-lg:first-child {
-  border-top-left-radius: 0.5rem;
-  border-bottom-left-radius: 0.5rem;
-}
-
-.first\:rounded-r-lg:first-child {
-  border-top-right-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
-}
-
-.last\:rounded-l-lg:last-child {
-  border-top-left-radius: 0.5rem;
-  border-bottom-left-radius: 0.5rem;
-}
-
-.last\:rounded-r-lg:last-child {
-  border-top-right-radius: 0.5rem;
-  border-bottom-right-radius: 0.5rem;
-}
-
-.last\:text-slate-700:last-child {
-  --tw-text-opacity: 1;
-  color: rgb(51 65 85 / var(--tw-text-opacity));
-}
-
-.checked\:\[background\:\#605BFF\]:checked {
-  background: #605BFF;
-}
-
-.checked\:\[border-color\:\#605BFF\]:checked {
-  border-color: #605BFF;
-}
-
 .hover\:text-white:hover {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
@@ -826,16 +778,4 @@ body {
 
 .hover\:\[background\:\#343750\]:hover {
   background: #343750;
-}
-
-.focus\:outline-1:focus {
-  outline-width: 1px;
-}
-
-.focus\:outline-offset-0:focus {
-  outline-offset: 0px;
-}
-
-.focus\:\[outline-color\:\#605BFF\]:focus {
-  outline-color: #605BFF;
 }

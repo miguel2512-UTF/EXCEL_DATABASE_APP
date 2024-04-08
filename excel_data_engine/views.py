@@ -3,30 +3,24 @@ from django.http import HttpResponse
 from .models import Excel
 from .forms import ExcelForm
 import pandas as pd
-import math
 import json
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
+@login_required
 def excel_home(request):
-    excel_list = list(Excel.objects.values("id", "name", "records_length"))
+    if request.user.is_superuser:
+        excel_list = list(Excel.objects.values("id", "name", "records_length"))
+    else:
+        excel_list = list(Excel.objects.values("id", "name", "records_length").filter(user=request.user.id))
+
     excel_list.sort(key=lambda x: x["id"])
     return render(request, "excel/excel.html", {"excel":"", "excel_list":excel_list, "form": ExcelForm()})
 
 def load_sheet_data(sheet_url):
-    df = pd.read_csv(sheet_url)
+    df = pd.read_csv(sheet_url, dtype="string")
+    df.fillna("", inplace=True)
     table = df.to_dict(orient='records')
-
-    column_names = table[0].keys()
-    column_names = list(column_names)
-
-    NoneType = type(None)
-    for index in range(len(table)):
-        for key in column_names:
-            if type(table[index][key]) == float:
-                if math.isnan(table[index][key]):
-                    table[index][key] = ''
-                table[index][key] = math.trunc(table[index][key]) if type(table[index][key]) != str else table[index][key]
-            elif type(table[index][key]) == NoneType:
-                table[index][key] = ''
     
     return json.dumps(table)
 
@@ -42,12 +36,10 @@ def refresh_excel(request, id_sheet):
 
 def create_excel(request):
     if request.method == "POST":
-        load_images = request.POST.get("load_images", False)
-        load_images = True if load_images else False
         excel = Excel(
             name=request.POST["name"],
             url=request.POST["url"],
-            loadImages=load_images
+            user=User.objects.get(id=request.user.id)
         )
 
         excel.data = load_sheet_data(excel.url)
@@ -88,17 +80,40 @@ def update_excel(request):
 
         return redirect("excel_home")
 
-def get_sheet_data(request, id_sheet):
+def get_sheet_data(request, name, id_sheet):
+    request.user = {
+        "id": 2,
+        "name": name
+    }
+    print(request.user)
     excel = Excel.objects.get(id = id_sheet)
     data = json.loads(excel.data)
-    fields = data[0].keys()
-    for field in fields:
-        param = request.GET.get(field, "")
-        data = [ record for record in data if record[field] == param ] if param != "" else data
+
+    if request.GET:
+        fields = data[0].keys()
+        for field in fields:
+            param = request.GET.get(field, "null")
+            data = [ record for record in data if record[field] == param ] if param != "null" else data
+    else:
+        body = json.loads(request.body) if request.body else {}
+        for key in body.keys():
+            value = body[key]
+            try:
+                data = [ record for record in data if record[key] == value ]
+            except KeyError:
+                res = {
+                    "success": False,
+                    "error": f"No column found with name {key}"
+                }
+                return HttpResponse(json.dumps(res), content_type="application/json", status=400)
 
     res = {
-        "length": len(data),
+        "success": True,
+        "results_length": len(data),
         "results": data
     }
 
     return HttpResponse(json.dumps(res), content_type = "application/json")
+
+def test(request, name):
+    return HttpResponse("Hola "+name)
