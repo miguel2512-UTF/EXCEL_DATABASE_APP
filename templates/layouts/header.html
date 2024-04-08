@@ -3,8 +3,10 @@
     <div class="flex items-center">
         <i class="bi bi-person-circle [font-size:2rem]"></i>
         <div class="m-2">
-            <p class="">User</p>
-            <p class="text-sm">Role</p>
+            <p class="">{{ user.username }}</p>
+            {% if user.is_superuser %}
+            <p class="text-sm">Administrador</p>
+            {% endif %}
         </div>
     </div>
 </div>

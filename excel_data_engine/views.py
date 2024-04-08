@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from .models import Excel
-from .forms import ExcelForm
+from .forms import ExcelForm, ApiForm
 import pandas as pd
 import json
 from django.contrib.auth.decorators import login_required
@@ -15,7 +15,7 @@ def excel_home(request):
         excel_list = list(Excel.objects.values("id", "name", "records_length").filter(user=request.user.id))
 
     excel_list.sort(key=lambda x: x["id"])
-    return render(request, "excel/excel.html", {"excel":"", "excel_list":excel_list, "form": ExcelForm()})
+    return render(request, "excel/excel.html", {"excel":"", "excel_list":excel_list, "form": ExcelForm(), "api_form": ApiForm()})
 
 def load_sheet_data(sheet_url):
     df = pd.read_csv(sheet_url, dtype="string")
@@ -50,12 +50,14 @@ def create_excel(request):
         return redirect("excel_home")
 
 def get_excel(request, id):
-    excel = Excel.objects.values("id", "name", "url").get(id=id)
+    excel = Excel.objects.values("id", "name", "url", "api_url", "api_isactive").get(id=id)
 
     excel_dict = {
         "id": excel["id"],
         "name": excel["name"],
         "url": excel["url"],
+        "api_url": excel["api_url"],
+        "api_isactive": excel["api_isactive"]
     }
 
     return HttpResponse(json.dumps(excel_dict), "application/json")
@@ -80,13 +82,17 @@ def update_excel(request):
 
         return redirect("excel_home")
 
-def get_sheet_data(request, name, id_sheet):
-    request.user = {
-        "id": 2,
-        "name": name
-    }
-    print(request.user)
+def get_sheet_data(request, name, api_password, id_sheet):
+    request.user = User.objects.get(username=name)
+
     excel = Excel.objects.get(id = id_sheet)
+
+    if excel.api_isactive == False:
+        raise Http404("Not found")
+
+    if api_password != excel.api_password:
+        raise Http404("Not found")
+
     data = json.loads(excel.data)
 
     if request.GET:
@@ -114,6 +120,16 @@ def get_sheet_data(request, name, id_sheet):
     }
 
     return HttpResponse(json.dumps(res), content_type = "application/json")
+
+def active_api(request):
+    if request.method == "POST":
+        excel = Excel.objects.get(id = request.POST["id"])
+        excel.api_password = request.POST["api_password"]
+        excel.api_isactive = True
+
+        excel.save()
+
+        return redirect("excel_home")
 
 def test(request, name):
     return HttpResponse("Hola "+name)
