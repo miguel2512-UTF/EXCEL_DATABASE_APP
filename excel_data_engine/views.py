@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
+from django.core.signing import Signer
 from .models import Excel
 from .forms import ExcelForm, ApiForm
 import pandas as pd
@@ -84,14 +85,17 @@ def update_excel(request):
 
 def get_sheet_data(request, name, api_password, id_sheet):
     request.user = User.objects.get(username=name)
+    signer = Signer()
 
     excel = Excel.objects.get(id = id_sheet)
 
-    if excel.api_isactive == False:
-        raise Http404("Not found")
+    try:
+        signer.unsign(f"{api_password}:{excel.api_password}")
+    except:
+        raise Http404()
 
-    if api_password != excel.api_password:
-        raise Http404("Not found")
+    if excel.api_isactive == False or excel.user.id != request.user.id:
+        raise Http404()
 
     data = json.loads(excel.data)
 
@@ -124,8 +128,11 @@ def get_sheet_data(request, name, api_password, id_sheet):
 def active_api(request):
     if request.method == "POST":
         excel = Excel.objects.get(id = request.POST["id"])
-        excel.api_password = request.POST["api_password"]
+        signer = Signer()
+        (password, signed_password) = signer.sign(request.POST["api_password"]).split(":")
+        excel.api_password = signed_password
         excel.api_isactive = True
+        excel.api_url = f"{request.META['HTTP_HOST']}/excel/api/{request.user.username}:password/data/{excel.id}"
 
         excel.save()
 
