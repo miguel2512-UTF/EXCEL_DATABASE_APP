@@ -132,7 +132,7 @@ def active_api(request):
         (password, signed_password) = signer.sign(request.POST["api_password"]).split(":")
         excel.api_password = signed_password
         excel.api_isactive = True
-        excel.api_url = f"{request.META['HTTP_HOST']}/excel/api/{request.user.username}:password/data/{excel.id}"
+        excel.api_url = f"{request.META['wsgi.url_scheme']}://{request.META['HTTP_HOST']}/excel/api/{request.user.username}:password/data/{excel.id}"
 
         excel.save()
 
