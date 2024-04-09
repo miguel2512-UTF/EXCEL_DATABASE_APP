@@ -4,6 +4,7 @@ click==8.1.7
 colorama==0.4.6
 Django==4.2.11
 django-appconf==1.0.6
+django-cors-headers==4.3.1
 gunicorn==21.2.0
 h11==0.14.0
 Jinja2==3.1.3
