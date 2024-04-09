@@ -18,7 +18,6 @@ def excel_home(request):
     excel_list.sort(key=lambda x: x["id"])
     return render(request, "excel/excel.html", {"excel":"", "excel_list":excel_list, "form": ExcelForm(), "api_form": ApiForm()})
 
-@login_required
 def load_sheet_data(sheet_url):
     df = pd.read_csv(sheet_url, dtype="string")
     df.fillna("", inplace=True)
