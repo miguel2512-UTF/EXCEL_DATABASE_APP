@@ -18,6 +18,7 @@ def excel_home(request):
     excel_list.sort(key=lambda x: x["id"])
     return render(request, "excel/excel.html", {"excel":"", "excel_list":excel_list, "form": ExcelForm(), "api_form": ApiForm()})
 
+@login_required
 def load_sheet_data(sheet_url):
     df = pd.read_csv(sheet_url, dtype="string")
     df.fillna("", inplace=True)
@@ -25,6 +26,7 @@ def load_sheet_data(sheet_url):
     
     return json.dumps(table)
 
+@login_required
 def refresh_excel(request, id_sheet):
     excel = Excel.objects.get(id = id_sheet)
     
@@ -35,6 +37,7 @@ def refresh_excel(request, id_sheet):
 
     return redirect("excel_home")
 
+@login_required
 def create_excel(request):
     if request.method == "POST":
         excel = Excel(
@@ -50,6 +53,7 @@ def create_excel(request):
 
         return redirect("excel_home")
 
+@login_required
 def get_excel(request, id):
     excel = Excel.objects.values("id", "name", "url", "api_url", "api_isactive").get(id=id)
 
@@ -63,6 +67,7 @@ def get_excel(request, id):
 
     return HttpResponse(json.dumps(excel_dict), "application/json")
 
+@login_required
 def update_excel(request):
     if request.method == "POST":
         excel = Excel.objects.get(id=request.POST["id"])
@@ -125,6 +130,7 @@ def get_sheet_data(request, name, api_password, id_sheet):
 
     return HttpResponse(json.dumps(res), content_type = "application/json")
 
+@login_required
 def active_api(request):
     if request.method == "POST":
         excel = Excel.objects.get(id = request.POST["id"])
@@ -137,6 +143,3 @@ def active_api(request):
         excel.save()
 
         return redirect("excel_home")
-
-def test(request, name):
-    return HttpResponse("Hola "+name)
