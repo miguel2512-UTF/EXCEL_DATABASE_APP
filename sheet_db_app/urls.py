@@ -1,5 +1,5 @@
 """
-URL configuration for excel_db_app project.
+URL configuration for sheet_db_app project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -24,6 +24,6 @@ def hello(request):
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('home/', hello),
-    path('sheet/', include('excel_data_engine.urls')),
+    path('sheet/', include('sheet_data_engine.urls')),
     path('', include('authentication.urls'))
 ]

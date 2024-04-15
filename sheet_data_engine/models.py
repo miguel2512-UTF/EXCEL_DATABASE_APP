@@ -14,4 +14,4 @@ class Sheet(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
-        db_table = "excel_database"
+        db_table = "sheet"
