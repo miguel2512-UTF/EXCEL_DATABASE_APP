@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Excel
+from .models import Sheet
 
 # Register your models here.
-admin.site.register(Excel)
+admin.site.register(Sheet)

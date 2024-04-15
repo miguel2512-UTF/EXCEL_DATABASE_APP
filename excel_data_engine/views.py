@@ -1,22 +1,22 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, Http404
 from django.core.signing import Signer
-from .models import Excel
-from .forms import ExcelForm, ApiForm
+from .models import Sheet
+from .forms import SheetForm, ApiForm
 import pandas as pd
 import json
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 
 @login_required
-def excel_home(request):
+def sheet_home(request):
     if request.user.is_superuser:
-        excel_list = list(Excel.objects.values("id", "name", "records_length"))
+        sheet_list = list(Sheet.objects.values("id", "name", "records_length"))
     else:
-        excel_list = list(Excel.objects.values("id", "name", "records_length").filter(user=request.user.id))
+        sheet_list = list(Sheet.objects.values("id", "name", "records_length").filter(user=request.user.id))
 
-    excel_list.sort(key=lambda x: x["id"])
-    return render(request, "excel/excel.html", {"excel":"", "excel_list":excel_list, "form": ExcelForm(), "api_form": ApiForm()})
+    sheet_list.sort(key=lambda x: x["id"])
+    return render(request, "sheet/sheet.html", {"sheet":"", "sheet_list":sheet_list, "form": SheetForm(), "api_form": ApiForm()})
 
 def load_sheet_data(sheet_url):
     df = pd.read_csv(sheet_url, dtype="string")
@@ -26,82 +26,76 @@ def load_sheet_data(sheet_url):
     return json.dumps(table)
 
 @login_required
-def refresh_excel(request, id_sheet):
-    excel = Excel.objects.get(id = id_sheet)
+def refresh_sheet(request, id_sheet):
+    sheet = Sheet.objects.get(id = id_sheet)
     
-    excel.data = load_sheet_data(excel.url)
-    excel.records_length = len(json.loads(excel.data))
+    sheet.data = load_sheet_data(sheet.url)
+    sheet.records_length = len(json.loads(sheet.data))
 
-    excel.save()
+    sheet.save()
 
-    return redirect("excel_home")
+    return redirect("sheet_home")
 
 @login_required
-def create_excel(request):
+def create_sheet(request):
     if request.method == "POST":
-        excel = Excel(
+        sheet = Sheet(
             name=request.POST["name"],
             url=request.POST["url"],
             user=User.objects.get(id=request.user.id)
         )
 
-        excel.data = load_sheet_data(excel.url)
-        excel.records_length = len(json.loads(excel.data))
+        sheet.data = load_sheet_data(sheet.url)
+        sheet.records_length = len(json.loads(sheet.data))
 
-        excel.save()
+        sheet.save()
 
-        return redirect("excel_home")
+        return redirect("sheet_home")
 
 @login_required
-def get_excel(request, id):
-    excel = Excel.objects.values("id", "name", "url", "api_url", "api_isactive").get(id=id)
+def get_sheet(request, id):
+    sheet = Sheet.objects.values("id", "name", "url", "api_url", "api_isactive").get(id=id)
 
-    excel_dict = {
-        "id": excel["id"],
-        "name": excel["name"],
-        "url": excel["url"],
-        "api_url": excel["api_url"],
-        "api_isactive": excel["api_isactive"]
+    sheet_dict = {
+        "id": sheet["id"],
+        "name": sheet["name"],
+        "url": sheet["url"],
+        "api_url": sheet["api_url"],
+        "api_isactive": sheet["api_isactive"]
     }
 
-    return HttpResponse(json.dumps(excel_dict), "application/json")
+    return HttpResponse(json.dumps(sheet_dict), "application/json")
 
 @login_required
-def update_excel(request):
+def update_sheet(request):
     if request.method == "POST":
-        excel = Excel.objects.get(id=request.POST["id"])
+        sheet = Sheet.objects.get(id=request.POST["id"])
 
-        excel.name = request.POST["name"]
-        excel.url = request.POST["url"]
+        sheet.name = request.POST["name"]
+        sheet.url = request.POST["url"]
 
-        load_images = request.POST.get("load_images", False)
-        if load_images:
-            excel.loadImages = True
-        else:
-            excel.loadImages = load_images
+        sheet.data = load_sheet_data(sheet.url)
+        sheet.records_length = len(json.loads(sheet.data))
 
-        excel.data = load_sheet_data(excel.url)
-        excel.records_length = len(json.loads(excel.data))
+        sheet.save()
 
-        excel.save()
-
-        return redirect("excel_home")
+        return redirect("sheet_home")
 
 def get_sheet_data(request, name, api_password, id_sheet):
     request.user = User.objects.get(username=name)
     signer = Signer()
 
-    excel = Excel.objects.get(id = id_sheet)
+    sheet = Sheet.objects.get(id = id_sheet)
 
     try:
-        signer.unsign(f"{api_password}:{excel.api_password}")
+        signer.unsign(f"{api_password}:{sheet.api_password}")
     except:
         raise Http404()
 
-    if excel.api_isactive == False or excel.user.id != request.user.id:
+    if sheet.api_isactive == False or sheet.user.id != request.user.id:
         raise Http404()
 
-    data = json.loads(excel.data)
+    data = json.loads(sheet.data)
 
     if request.GET:
         fields = data[0].keys()
@@ -132,13 +126,13 @@ def get_sheet_data(request, name, api_password, id_sheet):
 @login_required
 def active_api(request):
     if request.method == "POST":
-        excel = Excel.objects.get(id = request.POST["id"])
+        sheet = Sheet.objects.get(id = request.POST["id"])
         signer = Signer()
         (password, signed_password) = signer.sign(request.POST["api_password"]).split(":")
-        excel.api_password = signed_password
-        excel.api_isactive = True
-        excel.api_url = f"{request.META['wsgi.url_scheme']}://{request.META['HTTP_HOST']}/excel/api/{request.user.username}:password/data/{excel.id}"
+        sheet.api_password = signed_password
+        sheet.api_isactive = True
+        sheet.api_url = f"{request.META['wsgi.url_scheme']}://{request.META['HTTP_HOST']}/sheet/api/{request.user.username}:password/data/{sheet.id}"
 
-        excel.save()
+        sheet.save()
 
-        return redirect("excel_home")
+        return redirect("sheet_home")

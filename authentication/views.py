@@ -14,10 +14,10 @@ def sign_in(request):
             })
         else:
             login(request, user)
-            return redirect("/excel")
+            return redirect("sheet_home")
     else:
         if request.user.is_authenticated:
-            return redirect("/excel")
+            return redirect("sheet_home")
             
         return render(request, "login.html",{
             "form": LoginAuthenticationForm()
