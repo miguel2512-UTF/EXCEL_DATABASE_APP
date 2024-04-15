@@ -152,6 +152,7 @@
               <label class="my-1" for="{{ api_form.url_api.id_for_label }}">{{ api_form.url_api.label }}</label>
               <input 
               type="{{ api_form.url_api.field.widget.attrs.input_type }}"
+              name="{{ api_form.url_api.name }}"
               class="py-1.5 px-3 w-full [background:#212332] outline-none rounded-md focus:[outline-color:#605BFF] text-slate-500 focus:outline-1 focus:outline-offset-0 transition-all"
               {% for attr in api_form.url_api.field.widget.attrs %}
                 {{ attr }} = "{{ api_form.url_api.field.widget.attrs[attr] }}"
@@ -164,6 +165,7 @@
               <label class="my-1" for="{{ api_form.api_password.id_for_label }}">{{ api_form.api_password.label }}</label>
               <input 
               type="{{ api_form.api_password.field.widget.attrs.input_type }}"
+              name="{{ api_form.api_password.name }}"
               class="py-1.5 px-3 w-full [background:#212332] outline-none rounded-md focus:[outline-color:#605BFF] focus:outline-1 focus:outline-offset-0 transition-all"
               {% for attr in api_form.api_password.field.widget.attrs %}
                 {{ attr }} = "{{ api_form.api_password.field.widget.attrs[attr] }}"
